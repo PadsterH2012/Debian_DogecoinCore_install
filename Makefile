@@ -32,7 +32,18 @@ PACKAGES=                      \
 
 all:
 	apt-get -y install $(PACKAGES)
-
+	if [ ! -d $(DB4DIR) ]; then                                                              \
+		if [ ! -f $(DB51FILE) ]; then                                                     \
+			wget $(DB51URL);                                                          \
+		fi                                                                            && \
+		echo $(DB51HASH) $(DB51FILE) | sha256sum -c                                     && \
+		rm -Rf $(DB51VERSION)                                                          && \
+		tar -xzvf $(DB51FILE)                                                          && \
+		cd $(DB51VERSION)/build_unix/                                                  && \
+		../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$(DB51DIR) && \
+		mkdir -p $(DB51DIR)                                                            && \
+		make install;                                                                    \
+	fi
 	if [ ! -d dogecoin ]; then                                                            \
 		git clone https://github.com/dogecoin/dogecoin.git                          && \
 		cd dogecoin                                                                && \
